@@ -1,0 +1,9 @@
+{
+  "run_id": "run-real-01",
+  "config": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-real-01/config.json",
+  "predictions": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-real-01/run-agent/preds.json",
+  "eval_reports": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-real-01/run-eval/reports",
+  "eval_logs": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-real-01/run-eval/logs",
+  "metrics": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-real-01/metrics.json",
+  "storage_note": "Local only (S3 skipped per tutor instruction). To upload: aws s3 cp runs/run-real-01/ s3://your-bucket/runs/run-real-01/ --recursive"
+}

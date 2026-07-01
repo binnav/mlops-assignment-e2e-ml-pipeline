@@ -89,26 +89,37 @@ def evaluate_agent():
 
         print(f"Agent done. Predictions: {preds_path}")
         return custom_run_id
-
-    
     @task
     def run_eval(custom_run_id: str):
-        import shutil
         run_dir = RUNS_DIR / custom_run_id
-        reports_dir = run_dir / "run-eval" / "reports"
+        preds_path = run_dir / "run-agent" / "preds.json"
+        eval_dir = run_dir / "run-eval"
+        reports_dir = eval_dir / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
 
-    # Use sample eval results - Docker-based SWE-bench evaluation
-    # requires Docker which is not available per tutor instruction.
-    # In production this would run scripts/swe-bench-eval.sh
-        sample_results = PROJECT_ROOT / "sample" / "nebius__moonshotai__Kimi-K2.6.test.json"
-        dest = reports_dir / "results.json"
-        if sample_results.exists():
-            shutil.copy(sample_results, dest)
-            print(f"Copied sample eval results to {dest}")
-        else:
-            print(f"WARNING: Sample results not found at {sample_results}")
+        with open(run_dir / "config.json") as f:
+            config = json.load(f)
 
+        dataset = "princeton-nlp/SWE-bench_Verified" if config["subset"] == "verified" else "princeton-nlp/SWE-bench_Lite"
+
+        cmd = [
+            str(PROJECT_ROOT / ".venv" / "bin" / "python"),
+            "-m", "swebench.harness.run_evaluation",
+            "--dataset_name", dataset,
+            "--predictions_path", str(preds_path),
+            "--max_workers", str(config["workers"]),
+            "--run_id", custom_run_id,
+            "--report_dir", str(reports_dir),
+        ]
+
+        print(f"Running eval: {' '.join(cmd)}")
+
+        result = subprocess.run(cmd, cwd=reports_dir, env={**os.environ})
+
+        if result.returncode != 0:
+            raise RuntimeError(f"Eval failed with return code {result.returncode}")
+
+        print(f"Eval done. Reports in: {reports_dir}")
         return custom_run_id
   
 
@@ -121,9 +132,14 @@ def evaluate_agent():
         reports_dir = run_dir / "run-eval" / "reports"
 
         results_file = None
-        for f in reports_dir.glob("*.json"):
-            results_file = f
-            break
+        # Prefer the SWE-bench report file, which contains the run_id in its name
+        candidates = sorted(reports_dir.glob("*.json"))
+        for f in candidates:
+            if custom_run_id in f.name:
+                results_file = f
+                break
+        if results_file is None and candidates:
+            results_file = candidates[0]
 
         metrics = {
             "resolved_instances": 0,
