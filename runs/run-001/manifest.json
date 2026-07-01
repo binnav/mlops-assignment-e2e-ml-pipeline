@@ -1,0 +1,9 @@
+{
+  "run_id": "run-001",
+  "config": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-001/config.json",
+  "predictions": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-001/run-agent/preds.json",
+  "eval_reports": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-001/run-eval/reports",
+  "eval_logs": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-001/run-eval/logs",
+  "metrics": "/home/ubuntu/mlops-assignment-e2e-ml-pipeline/runs/run-001/metrics.json",
+  "storage_note": "Local only (S3 skipped per tutor instruction). To upload: aws s3 cp runs/run-001/ s3://your-bucket/runs/run-001/ --recursive"
+}
